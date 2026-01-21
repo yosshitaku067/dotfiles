@@ -1,0 +1,11 @@
+[tools]
+bat = "latest"
+cargo-binstall = "latest"
+"cargo:git-delta" = "latest"
+"cargo:sheldon" = "latest"
+eza = "latest"
+fzf = "latest"
+node = "latest"
+starship = "latest"
+usage = "latest"
+zoxide = "latest"

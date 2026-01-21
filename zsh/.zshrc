@@ -1,0 +1,41 @@
+# 1. Mise Activate
+eval "$(mise activate zsh)"
+
+# 2. Sheldon Init
+if type sheldon > /dev/null; then
+  eval "$(sheldon source)"
+fi
+
+# 3. Tools Init
+type starship > /dev/null && eval "$(starship init zsh)"
+type zoxide > /dev/null   && eval "$(zoxide init zsh)"
+type fzf > /dev/null      && source <(fzf --zsh)
+
+# 4. Aliases
+type bat > /dev/null      && alias cat="bat"
+type eza > /dev/null      && alias ls="eza --icons --git" && alias ll="eza -l --icons --git"
+alias g="git"
+alias dot="code $HOME/dotfiles"
+
+# 5. Fzf-Tab Settings (Preview)
+zstyle ':completion:*:git-checkout:*' sort false
+zstyle ':completion:*' list-colors ${(s.:.)LS_COLORS}
+zstyle ':fzf-tab:complete:cd:*' fzf-preview 'eza -1 --color=always $realpath'
+zstyle ':fzf-tab:complete:git-(checkout|switch|branch):*' fzf-preview 'git log --color=always --oneline --graph --date=short $word'
+
+# 6. Basic Settings
+autoload -Uz colors && colors
+autoload -Uz compinit && compinit
+HISTFILE="$HOME/.zsh_history"
+HISTSIZE=10000
+SAVEHIST=10000
+setopt share_history
+setopt hist_ignore_dups
+
+# 7. Keybindings
+if [[ -n "${terminfo[kcuu1]}" ]]; then
+  bindkey "${terminfo[kcuu1]}" history-substring-search-up
+fi
+if [[ -n "${terminfo[kcud1]}" ]]; then
+  bindkey "${terminfo[kcud1]}" history-substring-search-down
+fi
