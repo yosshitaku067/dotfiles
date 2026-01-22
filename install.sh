@@ -36,7 +36,7 @@ fi
 
 # --- 6. Dotfilesの展開 ---
 echo "🔧 Applying dotfiles via Chezmoi..."
-mise exec chezmoi -- chezmoi init --apply --source="$HOME/dotfiles"
+mise exec chezmoi -- chezmoi init --apply --force --source="$HOME/dotfiles"
 
 # --- 7. ツールのインストール ---
 echo "⬇️  Installing tools via Mise..."
