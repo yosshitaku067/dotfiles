@@ -43,4 +43,8 @@ echo "⬇️  Installing tools via Mise..."
 # config.toml に書かれたツール(Sheldon含む)を一括インストール
 mise install --yes
 
+# --- 7. Syncing mise changes back to chezmoi ---
+echo "🔄 Syncing potential mise config changes back to chezmoi..."
+mise exec chezmoi -- chezmoi add ~/.config/mise/config.toml
+
 echo "🎉 Setup Complete! Please restart your shell."
