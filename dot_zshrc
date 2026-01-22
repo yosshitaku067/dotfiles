@@ -39,3 +39,6 @@ fi
 if [[ -n "${terminfo[kcud1]}" ]]; then
   bindkey "${terminfo[kcud1]}" history-substring-search-down
 fi
+
+# 8. Local Environment Variables
+[ -f "$HOME/.zshrc.local" ] && source "$HOME/.zshrc.local"
