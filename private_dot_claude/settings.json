@@ -1,0 +1,10 @@
+{
+  "statusLine": {
+    "type": "command",
+    "command": "~/.claude/status-line.js"
+  },
+  "enabledPlugins": {
+    "tsumiki@tsumiki": true
+  },
+  "alwaysThinkingEnabled": true
+}

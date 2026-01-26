@@ -11,7 +11,7 @@ sudo apt install -y zsh unzip curl git libatomic1
 # --- 2. WSL Utilities ---
 if grep -q -i "microsoft" /proc/version; then
     echo "🐧 Installing WSL Utilities..."
-    sudo apt install -y wslu
+    sudo apt install -y wslu || echo "⚠️  wslu not available, skipping..."
 fi
 
 # --- 3. シェルの変更 ---
@@ -34,16 +34,24 @@ if ! command -v chezmoi >/dev/null 2>&1; then
     mise use -g chezmoi@latest
 fi
 
-# --- 6. Dotfilesの展開 ---
-echo "🔧 Applying dotfiles via Chezmoi..."
-mise exec chezmoi -- chezmoi init --apply --force --source="$HOME/dotfiles"
+# --- 5. Chezmoiソースディレクトリのセットアップ ---
+CHEZMOI_SOURCE_DIR="$HOME/.local/share/chezmoi"
+if [ ! -L "$CHEZMOI_SOURCE_DIR" ]; then
+    echo "🔗 Setting up Chezmoi source directory symlink..."
+    rm -rf "$CHEZMOI_SOURCE_DIR"
+    ln -s "$HOME/dotfiles" "$CHEZMOI_SOURCE_DIR"
+fi
 
-# --- 7. ツールのインストール ---
+# --- 7. Dotfilesの展開 ---
+echo "🔧 Applying dotfiles via Chezmoi..."
+mise exec chezmoi -- chezmoi init --apply --force
+
+# --- 8. ツールのインストール ---
 echo "⬇️  Installing tools via Mise..."
 # config.toml に書かれたツール(Sheldon含む)を一括インストール
 mise install --yes
 
-# --- 7. Syncing mise changes back to chezmoi ---
+# --- 9. Syncing mise changes back to chezmoi ---
 echo "🔄 Syncing potential mise config changes back to chezmoi..."
 mise exec chezmoi -- chezmoi add ~/.config/mise/config.toml
 

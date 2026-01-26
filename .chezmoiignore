@@ -1,4 +1,4 @@
+# Files not to be deployed to home directory
 install.sh
 README.md
 LICEMSE
-.claude
