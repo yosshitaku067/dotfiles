@@ -1,0 +1,40 @@
+#!/bin/bash
+# chezmoi適用時に既存の ~/.claude/settings.json と dotfiles のベース設定をマージする
+# stdin: 現在の ~/.claude/settings.json (存在しなければ空)
+# 出力: マージ結果。chezmoi がこれを ~/.claude/settings.json として書き込む
+#
+# マージ方針:
+#   - dotfiles に存在するキー: dotfiles 側が優先（statusLine/attribution/env など）
+#   - permissions.allow/deny/ask: 配列の和集合（Claude UI で動的追加された権限を保持）
+#   - dotfiles に存在しないキー: 既存値をそのまま保持（Bedrock 接続設定等）
+
+set -euo pipefail
+
+base=$(cat <<'BASE_JSON'
+{{ include ".chezmoitemplates/claude-settings-base.json" }}
+BASE_JSON
+)
+
+# stdin（既存ファイル内容）を読み取る。空ならファイル未存在として扱う
+input=$(cat)
+
+if [ -z "$input" ]; then
+  # 既存ファイルが無い → ベース設定をそのまま出力（jq 不要）
+  printf '%s\n' "$base"
+  exit 0
+fi
+
+# 既存ファイルがある場合は jq でマージする
+if ! command -v jq >/dev/null 2>&1; then
+  echo "modify_settings.json: jq が見つかりません。mise install で jq を導入してください" >&2
+  exit 1
+fi
+
+printf '%s\n' "$input" | jq --argjson base "$base" '
+  . as $current
+  | $base
+  | .permissions.allow = (($current.permissions.allow // []) + (.permissions.allow // []) | unique)
+  | .permissions.deny  = (($current.permissions.deny  // []) + (.permissions.deny  // []) | unique)
+  | .permissions.ask   = (($current.permissions.ask   // []) + (.permissions.ask   // []) | unique)
+  | ($current * .)
+'

@@ -1,0 +1,6 @@
+# Files not to be deployed to home directory
+install.sh
+README.md
+TASKS.md
+LICENSE
+docs

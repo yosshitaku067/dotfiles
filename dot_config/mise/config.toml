@@ -1,0 +1,23 @@
+# ツールバージョンは再現性のため固定している。
+# - 新版確認: `mise outdated`
+# - 更新手順: 下記のバージョンを書き換えて `mise install` を実行
+
+[tools]
+bat = "0.26.1"
+cargo-binstall = "1.19.0"
+chezmoi = "2.70.2"
+delta = "0.19.2"
+"cargo:sheldon" = "0.8.5"
+eza = "0.23.4"
+fzf = "0.72.0"
+gh = "2.92.0"
+node = "24.14.0"
+starship = "1.25.1"
+usage = "3.2.1"
+zoxide = "0.9.9"
+zellij = "0.44.1"
+ripgrep = "15.1.0"
+fd = "10.4.2"
+dust = "1.2.4"
+jq = "1.8.1"
+"npm:@beads/bd" = "0.49.6"

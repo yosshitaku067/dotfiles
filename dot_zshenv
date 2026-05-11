@@ -1,0 +1,36 @@
+# --- XDG Base Directory 設定 ---
+export XDG_CONFIG_HOME="$HOME/.config"
+export XDG_CACHE_HOME="$HOME/.cache"
+export XDG_DATA_HOME="$HOME/.local/share"
+
+# --- Mise や自作ツールのパス設定 ---
+case ":${PATH}:" in
+    *:"$HOME/.local/bin":*) ;;
+    *) export PATH="$HOME/.local/bin:$PATH" ;;
+esac
+
+# --- WSL2 でのブラウザ設定 ---
+# xdg-open を呼ばず $BROWSER を直接参照する CLI 向け
+if [[ -n "${WSL_DISTRO_NAME:-}" ]] || grep -qi microsoft /proc/version 2>/dev/null; then
+    export BROWSER='/mnt/c/Windows/System32/rundll32.exe url.dll,FileProtocolHandler'
+fi
+
+# --- エイリアス設定 ---
+type bat > /dev/null      && alias cat="bat"
+type eza > /dev/null      && alias ls="eza --icons --git" && alias ll="eza -l --icons --git"
+alias g="git"
+alias dot="code $HOME/dotfiles"
+alias lcurl="curl --interface 127.0.0.1"
+dcurl() {
+    for arg in "$@"; do
+        case "$arg" in
+            http://host.docker.internal|http://host.docker.internal/*|http://host.docker.internal:*|\
+            https://host.docker.internal|https://host.docker.internal/*|https://host.docker.internal:*)
+                curl "$@"
+                return
+                ;;
+        esac
+    done
+    echo "dcurl: host.docker.internal のみ許可されています。" >&2
+    return 1
+}
