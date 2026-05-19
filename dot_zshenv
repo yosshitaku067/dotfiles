@@ -15,22 +15,6 @@ if [[ -n "${WSL_DISTRO_NAME:-}" ]] || grep -qi microsoft /proc/version 2>/dev/nu
     export BROWSER='/mnt/c/Windows/System32/rundll32.exe url.dll,FileProtocolHandler'
 fi
 
-# --- エイリアス設定 ---
-type bat > /dev/null      && alias cat="bat"
-type eza > /dev/null      && alias ls="eza --icons --git" && alias ll="eza -l --icons --git"
-alias g="git"
-alias dot="code $HOME/dotfiles"
-alias lcurl="curl --interface 127.0.0.1"
-dcurl() {
-    for arg in "$@"; do
-        case "$arg" in
-            http://host.docker.internal|http://host.docker.internal/*|http://host.docker.internal:*|\
-            https://host.docker.internal|https://host.docker.internal/*|https://host.docker.internal:*)
-                curl "$@"
-                return
-                ;;
-        esac
-    done
-    echo "dcurl: host.docker.internal のみ許可されています。" >&2
-    return 1
-}
+# alias や関数などインタラクティブシェル専用の設定は .zshrc に置く。
+# .zshenv は scp / cron / 非対話 zsh からも評価されるため、
+# 対話前提の設定を入れると副作用 (stderr 漏れなど) の温床になる。

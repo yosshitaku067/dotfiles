@@ -61,13 +61,19 @@ if [ "$(readlink "$CHEZMOI_SOURCE_DIR" 2>/dev/null)" != "$HOME/dotfiles" ]; then
 fi
 
 # --- 7. Dotfilesの展開 ---
-echo "🔧 Applying dotfiles via Chezmoi..."
-mise exec chezmoi -- chezmoi init --apply --force
+# chezmoi は mise 経由で導入するため、未導入の場合はスキップする
+if mise which chezmoi >/dev/null 2>&1; then
+    echo "🔧 Applying dotfiles via Chezmoi..."
+    mise exec chezmoi -- chezmoi init --apply --force
+else
+    echo "⚠️  chezmoi が未導入のため Step 7 をスキップします。"
+fi
 
 # --- 8. ツールのインストール ---
 echo "⬇️  Installing tools via Mise..."
 # config.toml に書かれたツール(Sheldon含む)を一括インストール
-mise install --yes
+# 一部ツールのインストールが失敗しても後続処理を続行する
+mise install --yes || echo "⚠️  mise install で一部失敗しましたが処理を続行します。"
 
 # 上流に新バージョンが出ているツールを表示（メジャー越えも含む。情報目的・終了コードは無視）
 echo "🔎 Checking for tool updates (mise outdated --bump)..."
@@ -82,7 +88,12 @@ if ! command -v claude >/dev/null 2>&1; then
 fi
 
 # --- 10. Syncing mise changes back to chezmoi ---
-echo "🔄 Syncing potential mise config changes back to chezmoi..."
-mise exec chezmoi -- chezmoi add ~/.config/mise/config.toml
+# chezmoi は mise 経由で導入するため、未導入の場合はスキップする
+if mise which chezmoi >/dev/null 2>&1; then
+    echo "🔄 Syncing potential mise config changes back to chezmoi..."
+    mise exec chezmoi -- chezmoi add ~/.config/mise/config.toml
+else
+    echo "⚠️  chezmoi が未導入のため Step 10 をスキップします。"
+fi
 
 echo "🎉 Setup Complete! Please restart your shell."
