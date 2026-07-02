@@ -7,9 +7,14 @@ const { execSync } = require('child_process');
 // モデル名からコンテキストウィンドウサイズを判定
 function getContextWindowSize(modelName) {
   const name = (modelName || '').toLowerCase();
+  // 1M 明示指定は最優先で 1M
   if (name.includes("1m")) return 1000000;
-  if (name.includes("opus")) return 200000;
-  if (name.includes("sonnet")) return 200000;
+  // モデル名からバージョン番号(最初に現れる数値)を抽出
+  const version = parseFloat((name.match(/(\d+(?:\.\d+)?)/) || [])[1]);
+  // Opus は 4.8 以降がデフォルト 1M
+  if (name.includes("opus")) return version >= 4.8 ? 1000000 : 200000;
+  // Sonnet は 5 以降がデフォルト 1M
+  if (name.includes("sonnet")) return version >= 5 ? 1000000 : 200000;
   if (name.includes("haiku")) return 200000;
   return 200000; // デフォルト
 }
