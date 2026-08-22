@@ -6,6 +6,7 @@
 # マージ方針:
 #   - dotfiles に存在するキー: dotfiles 側が優先（statusLine/attribution/env など）
 #   - permissions.allow/deny/ask: 配列の和集合（Claude UI で動的追加された権限を保持）
+#   - permissions.deny の Write(パス) は Edit(パス) へ変換（Write ルールはファイル判定に効かないため）
 #   - dotfiles に存在しないキー: 既存値をそのまま保持（Bedrock 接続設定等）
 
 set -euo pipefail
@@ -34,7 +35,9 @@ printf '%s\n' "$input" | jq --argjson base "$base" '
   . as $current
   | $base
   | .permissions.allow = (($current.permissions.allow // []) + (.permissions.allow // []) | unique)
-  | .permissions.deny  = (($current.permissions.deny  // []) + (.permissions.deny  // []) | unique)
+  | .permissions.deny  = ((($current.permissions.deny // [])
+       | map(if startswith("Write(") then "Edit(" + .[6:] else . end))
+       + (.permissions.deny // []) | unique)
   | .permissions.ask   = (($current.permissions.ask   // []) + (.permissions.ask   // []) | unique)
   | ($current * .)
 '
